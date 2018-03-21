@@ -5,6 +5,7 @@ set -e
 # XferSerumPatchInstaller-OSX @ https://github.com/essobi/XferSerumPatchInstaller-OSX by Essobi #
 #################################################################################################
 
+### Don't blame me if you jackup your Serum presets.  It works for me.
 ### Will copy all *.fxp *.wav and *.shp in the subdirectories from where it is executed.
 ### Example:  Backup your user patches with something like...
 ### cp -Rp /Library/Audio/Presets/Xfer\ Records/Serum\ Presets/*/User/ /Volumes/BackupDisk/SerumUser/
@@ -38,13 +39,16 @@ function CopyFiles() {
 
 
 ### Expects you to be in the top directory with a struct of ./PRESETNAMETHATISQUOTESAFE/ANYNUMBERofFOLDERSAndSUBFOLDER/filesThatGetCopied[*.wav|*.fxp|*.shp]
+### figured someone else might be able to use this as a Custom Preset installer for fxp/wave/shp files.
 ### Looking for a dir struct of ./PRESETFOLDERNAME/*.fxp *.wav or *.shp for presets/wavtables/lfoshapes respectively.
 ## build dir list with first line removed since it's . Expects it to be quotable.
-## I didn't make this path safe.  If there's a space, period or otherwise a string that needs quotes, it needs changed.
+## I didn't make this bash loop expansion safe. (I don't use spaces in my User/FOLDER folder names.)
+
+## If there's a space, period or otherwise a string that needs quotes, it needs renamed. Patch names with spaces is fine.
+## CamelCasePatchNamesLookBetterAndTakeUpLessSpace :D
+## If you have a lot to rename, use OSX mass rename like here: https://www.tekrevue.com/tip/batch-rename-files-os-x-yosemite/
 
 DIRLIST=$(find . -maxdepth 1 -type d | sed '1d'  )
-
-## For each dir cd to it.. Find *.fxp/wav/shp and move to /Library/Audio/Presets/Xfer Records/[Presets/${XXXX}/LFO Shapes/User/${X}/
 for X in ${DIRLIST} ; do
     C=$(echo ${X} | cut -c 3-99)
     cd ${X} || ( echo "Failed in ${PWD}." && exit 254 )
@@ -59,3 +63,4 @@ done
 
 du -chs /Library/Audio/Presets/Xfer\ Records/Serum\ Presets/*/User ./
 
+## These should be roughly the same size after restoring.
